@@ -1,8 +1,8 @@
 #### Masterthesis Johanna Rütt ####
 #### Script for modelling and analyzing carbon footprints of western European dietary
 #### patterns performing probabilistic simulation ####
-#### Includes vizualization of results ####
-#### Mai 2021
+#### Includes visualization of results ####
+#### June 2021
 
 #Abbreviations for dietary pattern carbon footprints:
 #O_high = omnivorous diet (7 times meat per week)
@@ -421,12 +421,6 @@ welfare_summary <- read.csv(paste(results_folder,"/welfareDecisionSummary.csv",s
 
 calc_SUSLA <- read.csv("CALCSUSLA.csv")
 
-### Create table with all footprints ###
-data_CFs <- rbind(data_VN, data_VT, data_O_low, data_O_medium, data_O_high)
-
-data_CF_distance <- cbind(data_VN$values, data_VT$values, 
-                          data_O_low$values, data_O_medium$values, data_O_high$values)
-
 #### Calculate the share of 2- and 1.5-degree global warming thresholds trespassed ####
 
 threshold2 <- c(sum(data_VN$values<2365)/10000,
@@ -445,7 +439,7 @@ dietary_pattern <- c("VN", "VT", "O_low", "O_medium", "O_high")
 
 threshold <- data.frame(dietary_pattern, threshold2, threshold1.5)
 
-write.csv(threshold, "thresholdRitchie.csv")
+write.csv(threshold, "thresholds_gw.csv")
 
 #### Calculate the share of food system specific
 #### 2- and 1.5-degree global warming thresholds trespassed ####
@@ -456,7 +450,6 @@ threshold2share <- c(sum(data_VN$values<(2365/100*35))/10000,
                      sum(data_VT$values<(2365/100*35))/10000)
 dietary_pattern2 <- c("VN", "VT")
 thresholdshare <- data.frame(dietary_pattern2, threshold2share)
-
 
 #####Calculate overlaps of dietary pattern carbon footprints#####
 
@@ -524,9 +517,6 @@ listoverlap_switch <- list(O_medium,
                            diff_O_mediumVN, diff_O_lowVT, diff_O_lowVN,
                            diff_VTVN)
 
-overlapresult_switch <- overlap(listoverlap_switch, plot=TRUE)
-overlapresult <- overlap(listoverlap)
-
 ###Create a summary of dietary pattern carbon footprint differences calculated 
 
 stat_diff_O_high3 <- abs(c(quantile(O_medium, 
@@ -557,8 +547,877 @@ stat_diff <- rbind(stat_diff_O_high3, stat_diff_O_high1, stat_diff_O_highVT, sta
 
 write.csv(stat_diff, "stat_diff.csv")
 
-#### Vizualize modelling results ####
+###### Vizualize modelling results ######
+
+#### Dietary Pattern Carbon Footprints - Plotting ####
+
+#O_high
+data_O_high <- read.csv("results/mcSimulationResults.csv")
+data_O_high <- dplyr::select(data_O_high, starts_with("CF_O_high")) %>%
+  stack(drop=FALSE)
+data_O_high$values <- as.numeric(data_O_high$values) 
+distribution_O_high <- ggplot(data_O_high, aes(x = values, y = ind, fill = ind)) +
+  geom_density(aes(y = ..density.., alpha = 0.5)) + #..density for density estimate, ..scaled to max of 1
+  scale_fill_manual(labels = ("O_high"), values = ("firebrick4"),guide="legend") +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = calc_SUSLA$CF[1]), color="firebrick4", linetype = "dashed") +
+  ylim(0, 0.003) +
+  xlim(0,8000)+
+  annotate(geom = "text",
+           label = "SUSLA CF",
+           x = calc_SUSLA$CF[1],
+           y = 0.0025,
+           angle = 270, 
+           vjust = 1.5,
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=18),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_O_high.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#O_medium
+data_O_medium <- read.csv("results/mcSimulationResults.csv")
+data_O_medium <- dplyr::select(data_O_medium, starts_with("CF_O_medium")) %>%
+  stack(drop=FALSE)
+data_O_medium$values <- as.numeric(data_O_medium$values) 
+distribution_O_medium <- ggplot(data_O_medium, aes(x = values, y = ind, fill = ind)) +
+  geom_density(aes(y = ..density.., alpha = 0.5)) +
+  scale_fill_manual(labels = ("O_medium"), values = ("red"),guide="legend") +
+  #  geom_boxploth(aes(x = values, y = 0.03), width = 0.03, fill = "limegreen" ) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = calc_SUSLA$CF[2]), color="red", linetype = "dashed") +
+  ylim(0, 0.003) +
+  xlim(0,8000)+
+  annotate(geom = "text",
+           label = "SUSLA CF",
+           x = calc_SUSLA$CF[2],
+           y = 0.0025,
+           angle = 270, 
+           vjust = 1.5,
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=18),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_O_medium.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Olow
+data_O_low <- read.csv("results/mcSimulationResults.csv")
+data_O_low <- dplyr::select(data_O_low, starts_with("CF_O_low")) %>%
+  stack(drop=FALSE)
+data_O_low$values <- as.numeric(data_O_low$values) 
+distribution_O_low <- ggplot(data_O_low, aes(x = values, y = ind, fill = ind)) +
+  geom_density(aes(y = ..density.., alpha = 0.5)) +
+  scale_fill_manual(labels = ("O_low"), values = ("salmon"),guide="legend") +
+  #geom_boxploth(aes(x = values, y = 0.03), width = 0.03, fill = "limegreen" ) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = calc_SUSLA$CF[3]), color="salmon", linetype = "dashed") +
+  ylim(0, 0.003) +
+  xlim(0,8000)+
+  annotate(geom = "text",
+           label = "SUSLA CF",
+           x = calc_SUSLA$CF[3],
+           y= 0.0025,
+           angle = 270, 
+           vjust = 1.5,
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=18),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_O_low.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Vegetarian
+data_VT <- read.csv("results/mcSimulationResults.csv")
+data_VT <- dplyr::select(data_VT, starts_with("CF_VT")) %>%
+  stack(drop=FALSE)
+data_VT$values <- as.numeric(data_VT$values) 
+distribution_VT <- ggplot(data_VT, aes(x = values, y = ind, fill = ind)) +
+  geom_density(aes(y = ..density.., alpha = 0.5)) +
+  scale_fill_manual(labels = ("VT"), values = ("limegreen"),guide="legend") +
+  #  geom_boxploth(aes(x = values, y = 0.03), width = 0.03, fill = "limegreen" ) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = calc_SUSLA$CF[4]), color="darkseagreen4", linetype = "dashed") +
+  ylim(0, 0.003) +
+  xlim(0,8000)+
+  annotate(geom = "text",
+           label = "SUSLA CF",
+           x = calc_SUSLA$CF[4],
+           y = 0.0025,
+           angle = 270, 
+           vjust = 1.5,
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=18),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_VT.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Vegan
+data_VN <- read.csv("results/mcSimulationResults.csv")
+data_VN <- dplyr::select(data_VN, starts_with("CF_VN")) %>%
+  stack(drop=FALSE)
+data_VN$values <- as.numeric(data_VN$values) 
+distribution_VN <- ggplot(data_VN, aes(x = values, y = ind)) +
+  geom_vline(aes(xintercept = values[2]), color = "darkgreen") +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = calc_SUSLA$CF[5]), color = "darkgreen", linetype = "dashed") +
+  ylim(0, 0.003) +
+  xlim(0,8000)+
+  annotate(geom = "text",
+           label = "SUSLA CF",
+           x = calc_SUSLA$CF[5],
+           y = 0.0025,
+           angle = 270, 
+           vjust = 1.5,
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=18),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_VN.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Combine plots in a grid
+
+plot_grid(distribution_VN,
+          distribution_VT,
+          distribution_O_low,
+          distribution_O_medium,
+          distribution_O_high,
+          labels = c('Vegan','Vegetarian',
+                     "O_low",
+                     "O_medium",
+                     "O_high"),
+          label_size = 18,
+          label_x = 0.5,
+          label_y = 0.9,
+          scale = 0.9,
+          nrow = 2)
 
 
+ggsave(path = "figures", "compare_all_pf.png", device = "png",  
+       width = 40, height = 30, units = "cm")
+
+#Combine distributions in a single plot
+
+x <- data.frame(data_O_high, data_O_medium, data_O_low, data_VT)
+data <- melt(x)
+
+distribution_all <- ggplot(data, aes(x=value, fill=variable)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(aes(xintercept = CF_VN, color = "VN"), size = 0.75) +
+  scale_color_manual(values = "darkgreen")+
+  scale_fill_manual(values = c("firebrick4", "red", "salmon", "limegreen")) +
+  geom_vline(aes(xintercept = 0)) +
+  xlim(0, 10000) +
+  ylim(0, 0.003) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=18,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_all.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Include 1.5- and 2-degree global warming greenhouse gas emission thresholds
+#in the plots
+
+distribution_all <- ggplot(data, aes(x=value, fill=variable)) + 
+  geom_density(alpha = 0.5) +
+  geom_vline(aes(xintercept = CF_VN, color = "VN"), size = 0.75) +
+  scale_color_manual(values = "darkgreen")+
+  scale_fill_manual(values = c("firebrick4", "red", "salmon", "limegreen")) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(xintercept = 2365, linetype = "dashed", color = "gold3", size = 1) +
+  geom_vline(xintercept = 1337, linetype = "dashed", color = "orange3", size = 1) +
+  annotate(geom = "text",
+           label = c("2-degree threshold", "1.5-degree threshold"),
+           color = c("gold3", "orange3"),
+           x = c(2345, 1337),
+           y = c(0.0025, 0.0025),
+           angle = 270, 
+           vjust = -1.5,
+           size = 5) +
+  xlim(0, 10000) +
+  ylim(0, 0.003) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=18,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_gwthresholds.png", device = "png",  
+       width = 40, height = 20, units = "cm")
+
+#Include food system specific 1.5- and 2-degree global warming greenhouse gas 
+#emission thresholds in the plots
+
+distribution_all <- ggplot(data, aes(x=value, fill=variable)) +
+  annotate("rect", xmin = 1337/100*9.5, xmax = 1337/100*35, ymin = 0, ymax =Inf,
+           fill = "orange3", alpha = 0.2)+
+  annotate("rect", xmin = 2365/100*9.5, xmax = 2365/100*35, ymin = 0, ymax =Inf,
+           fill = "gold", alpha = 0.2)+
+  geom_density(alpha = 0.5) +
+  geom_vline(xintercept = CF_VN, color = "darkgreen", size = 0.75) +
+  scale_fill_manual(values = c("firebrick4", "red", "salmon", "limegreen")) +
+  geom_vline(xintercept = (1337/100*9.5), color = "orange3", linetype = "dashed", size = 0.5) +
+  geom_vline(xintercept = (1337/100*35), color = "orange3", linetype = "dashed", size = 0.5) +
+  geom_vline(xintercept = (2365/100*9.5), color = "gold3", linetype = "dashed", size = 0.5) +
+  geom_vline(xintercept = (2365/100*35), color = "gold3", linetype = "dashed", size = 0.5) +
+  annotate(geom = "text",
+           label = c("1.5-degree threshold EU food system", "2-degree threshold EU food system"),
+           x = c(1337/100*35, 2365/100*35),
+           y = c(0.0015, 0.0015),
+           color = c("orange3", "gold3"),
+           angle = 270, 
+           vjust = 2,
+           size = 5) +
+  geom_vline(aes(xintercept = 0)) +
+  xlim(0, 10000) +
+  ylim(0, 0.003) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=18,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Carbon footprint (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "distribution_gwthresholdsfood.png", device = "png",  
+       width = 40, height = 20, units = "cm")
+
+#####Changes of carbon footprint when switching dietary patterns #####
+
+#Switching from O_high 
+diff_O_high <- data.frame(O_medium,
+                          O_low,
+                          VT, 
+                          VN)
+data_diff_O_high <- melt(diff_O_high)
+
+diff_O_high_pf <- ggplot(data_diff_O_high, aes(x=value, fill=variable)) + 
+  geom_density(alpha=0.5) +
+  scale_fill_manual(name = "CF change when switching to", values = c("red", "salmon","limegreen", "darkgreen")) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = (-739), color = "O_medium"), linetype = "dashed") +
+  geom_vline(aes(xintercept = (-1638), color = "O_low"), linetype = "dashed") +
+  geom_vline(aes(xintercept = (-1819), color = "VT"), linetype = "dashed") +
+  geom_vline(aes(xintercept = (-2153), color = "VN"), linetype = "dashed") +
+  scale_color_manual(name = "SUSLA CF change when switching to", values = c("salmon","red", "darkgreen","darkseagreen4")) +
+  xlim(-6000, 6000) +
+  coord_cartesian(ylim = c(0, 0.003))+
+  #  ylim(0, 0.01) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_text(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Changes in CF (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "diff_0_high.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Switching from O_medium
+
+diff_O_medium <- data.frame(O_high,
+                            diff_O_medium1,
+                            diff_O_mediumVT,
+                            diff_O_mediumVN)
+data_diff_O_medium <- melt(diff_O_medium)
+
+diff_O_medium_pf <- ggplot(data_diff_O_medium, aes(x=value, fill=variable)) + geom_density(alpha=0.5) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(aes(xintercept = (739), color = "O_high"), linetype = "dashed") +
+  scale_color_manual(name = "SUSLA CF change when switching to", values = c("firebrick4")) +
+  geom_vline(xintercept = (-845), color = "salmon", linetype = "dashed") +
+  geom_vline(xintercept = (-1026), color = "darkseagreen4", linetype = "dashed") +
+  geom_vline(xintercept = (-1360), color = "darkgreen", linetype = "dashed") +
+  scale_fill_manual(name = "CF change when switching to", values = c("firebrick4", "salmon", "limegreen", "darkgreen")) +
+  xlim(-6000, 6000) +
+  # ylim(0, 0.01) +
+  coord_cartesian(ylim = c(0, 0.003))+
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Changes in CF (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "diff_O_medium.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Switching from O_low
+
+diff_O_low <- data.frame(diff_O_low7,
+                         diff_O_low3,
+                         diff_O_lowVT,
+                         diff_O_lowVN)
+data_diff_O_low <- melt(diff_O_low)
+
+diff_O_low_pf <- ggplot(data_diff_O_low, aes(x=value, fill=variable)) + geom_density(alpha=0.5) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(xintercept = (1638), color = "firebrick4", linetype = "dashed") +
+  geom_vline(xintercept = (845), color = "red", linetype = "dashed") +
+  geom_vline(xintercept = (-181), color = "darkseagreen4", linetype = "dashed") +
+  geom_vline(xintercept = (-515), color = "darkgreen", linetype = "dashed") +
+  scale_fill_manual(values = c("firebrick4", "red", "limegreen", "darkgreen")) +
+  xlim(-6000, 6000) +
+  #  coord_cartesian(ylim = c(0, 0.003))+
+  ylim(0, 0.01) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Changes in CF (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "diff_O_low_max.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Switching from Vegetarian
+
+diff_VT <- data.frame(diff_VTO_high,
+                      diff_VTO_medium,
+                      diff_VTO_low,
+                      diff_VTVN)
+data_diff_VT <- melt(diff_VT)
+
+diff_VT_pf <- ggplot(data_diff_VT, aes(x=value, fill=variable)) + geom_density(alpha=0.5) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(xintercept = (1819), color = "firebrick4", linetype = "dashed") +
+  geom_vline(xintercept = (1026), color = "red", linetype = "dashed") +
+  geom_vline(xintercept = (181), color = "salmon", linetype = "dashed") +
+  geom_vline(xintercept = (-334), color = "darkgreen", linetype = "dashed") +
+  scale_fill_manual(values = c("firebrick4", "red", "salmon", "darkgreen")) +
+  xlim(-6000, 6000) +
+  coord_cartesian(ylim = c(0, 0.003))+
+  #  ylim(0, 0.01) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Changes in CF (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "diff_VT.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Switching from Vegan
+
+diff_VN <- data.frame(diff_VNO_high,
+                      diff_VNO_medium,
+                      diff_VNO_low,
+                      diff_VNVT)
+data_diff_VN <- melt(diff_VN)
+
+diff_VN_pf <- ggplot(data_diff_VN, aes(x=value, fill=variable)) + geom_density(alpha=0.5) +
+  geom_vline(aes(xintercept = 0)) +
+  geom_vline(xintercept = (2153), color = "firebrick4", linetype = "dashed") +
+  geom_vline(xintercept = (1360), color = "red", linetype = "dashed") +
+  geom_vline(xintercept = (515), color = "salmon", linetype = "dashed") +
+  geom_vline(xintercept = (334), color = "darkseagreen4", linetype = "dashed") +
+  scale_fill_manual(values = c("firebrick4", "red", "salmon", "limegreen")) +
+  #  scale_y_continuous(limits = c(0,0.003)) +
+  xlim(-6000, 6000) +
+  coord_cartesian(ylim = c(0, 0.003))+
+  #  ylim(0, 0.01) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  xlab("Changes in CF (kgCO2e per capita per year)")+ 
+  ylab("Density") 
+
+ggsave(path = "figures", "diff_VN.png", device = "png",  width = 40, 
+       height = 20, units = "cm")
+
+#Combine plots
+
+plot_grid(diff_VN_pf,
+          diff_VT_pf,
+          diff_O_low_pf,
+          diff_O_medium_pf,
+          diff_O_high_pf,
+          labels = c('Change from \n Vegan','Change from \n Vegetarian',
+                     'Change from \n O_low',"Change from \n O_medium",
+                     'Change from \n O_high'),
+          label_size = 16,
+          label_x = 0.175,
+          hjust = -0.06,
+          vjust = 2,
+          scale = 0.9,
+          ncol = 2)
+
+ggsave(path = "figures", file="diff_all.png",
+       width = 40, height = 40, units = "cm")
+
+####VIP Plots####
+#O_high
+VIP_data_Tests <- read.csv("results/CF_O_high_pls_results.csv",
+                           header = TRUE) %>%
+  data.frame(.) %>%
+  .[order(-.$VIP),] %>%
+  head(., 8) 
+
+colnames(VIP_data_Tests)[colnames(VIP_data_Tests)=="X"] <- "Variable"
+
+VIP_data_Tests$Variable <- as.character(VIP_data_Tests$Variable) 
+
+VIP_data_Tests <- VIP_data_Tests[order(VIP_data_Tests$VIP), ]  # sort
+VIP_data_Tests$Variable <- factor(VIP_data_Tests$Variable, levels = VIP_data_Tests$Variable)
+VIP_data_Tests$VIP <- round(VIP_data_Tests$VIP, digits= 2)
+
+VIP_data_Tests$color <- ifelse(VIP_data_Tests$VIP>0.8, "forestgreen", "white")
+VIP_data_Tests$color <- as.character(VIP_data_Tests$color)
+VIP_barplot_O_high <- ggplot(VIP_data_Tests, aes(Variable, VIP, label = VIP, fill = VIP)) +
+  geom_bar(width = 1, stat = "identity", color = "black", fill = VIP_data_Tests$color) +
+  geom_text(aes(y=3, label=VIP), size = 4.8, color="black", hjust = 1)+ #or max as VIP
+  ggtitle(" ") +
+  geom_hline(yintercept = 0.8) +
+  theme_bw()+theme(panel.grid=element_blank())+
+  coord_flip()+
+  ylim(0,4)+
+  theme(plot.title = element_text(color = "black", size = 15, face = "bold"),
+        axis.title.y = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        legend.position = "none",
+        axis.title.x=element_text(),
+        axis.text = element_text(size=15),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank())
+ggsave(path = "figures", "VIP_O_high.png", device = "png",  width = 20, height = 20, units = "cm")
+
+#O_medium
+VIP_data_Tests <- read.csv("results/CF_O_medium_pls_results.csv",
+                           header = TRUE) %>%
+  data.frame(.) %>%
+  .[order(-.$VIP),] %>%
+  head(., 8) 
+
+colnames(VIP_data_Tests)[colnames(VIP_data_Tests)=="X"] <- "Variable"
+
+VIP_data_Tests$Variable <- as.character(VIP_data_Tests$Variable) 
+
+VIP_data_Tests <- VIP_data_Tests[order(VIP_data_Tests$VIP), ]  # sort
+VIP_data_Tests$Variable <- factor(VIP_data_Tests$Variable, levels = VIP_data_Tests$Variable)
+VIP_data_Tests$VIP <- round(VIP_data_Tests$VIP, digits= 2)
+
+VIP_data_Tests$color <- ifelse(VIP_data_Tests$VIP>0.8, "forestgreen", "white")
+VIP_data_Tests$color <- as.character(VIP_data_Tests$color)
+VIP_barplot_O_medium <- ggplot(VIP_data_Tests, aes(Variable, VIP, label = VIP, fill = VIP)) +
+  geom_bar(width = 1, stat = "identity", color = "black", fill = VIP_data_Tests$color) +
+  geom_text(aes(y=3, label=VIP), size = 4.8, color="black", hjust = 1)+ #or max as VIP
+  ggtitle(" ") +
+  geom_hline(yintercept = 0.8) +
+  theme_bw()+theme(panel.grid=element_blank())+
+  coord_flip()+
+  ylim(0,4)+
+  theme(plot.title = element_text(color = "black", size = 15, face = "bold"),
+        axis.title.y = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        legend.position = "none",
+        axis.title.x=element_text(),
+        axis.text = element_text(size=15),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank())
+ggsave(path = "figures", "VIP_O_medium.png", device = "png",  width = 20, height = 20, units = "cm")
+
+#O_low
+VIP_data_Tests <- read.csv("results/CF_O_low_pls_results.csv",
+                           header = TRUE) %>%
+  data.frame(.) %>%
+  .[order(-.$VIP),] %>%
+  head(., 8) 
+
+colnames(VIP_data_Tests)[colnames(VIP_data_Tests)=="X"] <- "Variable"
+
+VIP_data_Tests$Variable <- as.character(VIP_data_Tests$Variable) 
+
+VIP_data_Tests <- VIP_data_Tests[order(VIP_data_Tests$VIP), ]  # sort
+VIP_data_Tests$Variable <- factor(VIP_data_Tests$Variable, levels = VIP_data_Tests$Variable)
+VIP_data_Tests$VIP <- round(VIP_data_Tests$VIP, digits= 2)
+
+VIP_data_Tests$color <- ifelse(VIP_data_Tests$VIP>0.8, "forestgreen", "white")
+VIP_data_Tests$color <- as.character(VIP_data_Tests$color)
+VIP_barplot_O_low <- ggplot(VIP_data_Tests, aes(Variable, VIP, label = VIP, fill = VIP)) +
+  geom_bar(width = 1, stat = "identity", color = "black", fill = VIP_data_Tests$color) +
+  geom_text(aes(y=3, label=VIP), size = 4.8, color="black", hjust = 1)+ #or max as VIP
+  ggtitle(" ") +
+  geom_hline(yintercept = 0.8) +
+  theme_bw()+theme(panel.grid=element_blank())+
+  coord_flip()+
+  ylim(0,4)+
+  theme(plot.title = element_text(color = "black", size = 15, face = "bold"),
+        axis.title.y = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        legend.position = "none",
+        axis.title.x=element_text(),
+        axis.text = element_text(size=15),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank())
+ggsave(path = "figures", "VIP_O_low.png", device = "png",  width = 20, height = 20, units = "cm")
+
+#Vegetarian
+VIP_data_Tests <- read.csv("results/CF_VT_pls_results.csv",
+                           header = TRUE) %>%
+  data.frame(.) %>%
+  .[order(-.$VIP),] %>%
+  head(., 8) 
+
+colnames(VIP_data_Tests)[colnames(VIP_data_Tests)=="X"] <- "Variable"
+
+VIP_data_Tests$Variable <- as.character(VIP_data_Tests$Variable) 
+
+VIP_data_Tests <- VIP_data_Tests[order(VIP_data_Tests$VIP), ]  # sort
+VIP_data_Tests$Variable <- factor(VIP_data_Tests$Variable, levels = VIP_data_Tests$Variable)
+VIP_data_Tests$VIP <- round(VIP_data_Tests$VIP, digits= 2)
+
+VIP_data_Tests$color <- ifelse(VIP_data_Tests$VIP>0.8, "forestgreen", "white")
+VIP_data_Tests$color <- as.character(VIP_data_Tests$color)
+VIP_barplot_VT <- ggplot(VIP_data_Tests, aes(Variable, VIP, label = VIP, fill = VIP)) +
+  geom_bar(width = 1, stat = "identity", color = "black", fill = VIP_data_Tests$color) +
+  geom_text(aes(y=3, label=VIP), size = 4.8, color="black", hjust = 1)+ #or max as VIP
+  ggtitle(" ") +
+  geom_hline(yintercept = 0.8) +
+  theme_bw()+theme(panel.grid=element_blank())+
+  coord_flip()+
+  ylim(0,4)+
+  theme(plot.title = element_text(color = "black", size = 15, face = "bold"),
+        axis.title.y = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_blank(),
+        legend.position = "none",
+        axis.title.x=element_text(),
+        axis.text = element_text(size=15),
+        axis.title = element_text(size=15,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank())
+ggsave(path = "figures", "VIP_VT.png", device = "png",  width = 20, height = 20, units = "cm")
+
+#Combine VIP plots
+
+plot_grid(VIP_barplot_O_high,
+          VIP_barplot_O_medium,
+          VIP_barplot_O_low,
+          VIP_barplot_VT,
+          labels = c('O_high','O_medium',"O_low","Vegetarian"),
+          label_x = 0.2,
+          ncol = 2)
+
+ggsave(path = "figures", file="VIP_all.png",
+       width = 40, height = 30, units = "cm")
+
+####Plot carbon footprints found in literature####
+
+lit <- read.csv("scenarios_lit.csv")
+
+lit_graph_study <- ggplot(lit, aes(y=CF, x=study, color= diet_type)) + 
+  geom_point(size=4) +
+  geom_hline(yintercept = (1337), color = "orange3", linetype = "dashed") +
+  geom_hline(yintercept = (2365), color = "gold3", linetype = "dashed") +
+  annotate(geom = "text",
+           label = c("2-degree threshold", "1.5-degree threshold"),
+           color = c("gold3", "orange3"),
+           x = c(8.9,8.9),
+           y = c(2425, 1397),
+           size = 5) +
+  scale_color_manual(values = c("O_medium" = "red",
+                                "Vegetarian"="limegreen",
+                                "Vegan"="darkgreen",
+                                "Pescetarian" = "blue",
+                                "O_low" = "salmon",
+                                "O_high" = "firebrick4")) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(angle = 45, hjust=1), #if 90° then add  vjust=0.5
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "right",
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  ylab("Carbon footprint (kgCO2e per capita per year)") +
+  xlab("Study")
+
+ggsave(path = "figures", "lit_study.png", device = "png",  
+       width = 40, height = 20, units = "cm")
+
+lit_graph_order <- ggplot(lit, aes(y=CF, x=(reorder(diet_type, number)), 
+                                   color = diet_type)) +
+  geom_boxplot(color="black") +
+  geom_point(size=4) +
+  geom_hline(yintercept = (1337), color = "orange3", linetype = "dashed") +
+  geom_hline(yintercept = (2365), color = "gold3", linetype = "dashed") +
+  # scale_x_discrete(lit) +
+  scale_color_manual(values = c("O_medium" = "red",
+                                "Vegetarian"="limegreen",
+                                "Vegan"="darkgreen",
+                                "PES" = "blue",
+                                "O_low" = "salmon",
+                                "O_high" = "firebrick4")) +
+  annotate(geom = "text",
+           label = c("2-degree threshold", "1.5-degree threshold"),
+           color = c("gold3", "orange3"),
+           x = c(6.1,6.1),
+           y = c(2425, 1397),
+           size = 5) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_text(),
+        axis.text.x=element_text(angle = 45, hjust=1),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=14),
+        legend.position = "none",
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank()) +
+  ylab("Carbon footprint (kgCO2e per capita per year)") +
+  xlab("Dietary pattern")
+
+ggsave(path = "figures", "lit_order.png", device = "png",  
+       width = 40, height = 20, units = "cm")
+
+plot_grid(lit_graph_study, lit_graph_order,
+          label_x = 0.2,
+          nrow = 2,
+          scale = 0.9)
+
+ggsave(path = "figures", "lit_studyorder.png", device = "png",  
+       width = 40, height = 40, units = "cm")
+
+####Compare results to carbon footprints in literature####
+
+#Vegan carbon footprints
+Vegan_lit<- read.csv("VN_lit.csv")
+data_boxplotVN <- rbind(data_VN,Vegan_lit)
+boxplot_VN <- ggplot(data_boxplotVN, aes(y=ind, x=values, fill = ind,
+                                         color= ind )) +
+  geom_boxplot(alpha=0.5) +
+  scale_fill_manual(values = c("darkgreen", "darkgreen", "darkgreen","darkgreen",
+                               "darkgreen", "darkgreen", "darkgreen", "darkgreen")) +
+  scale_color_manual(values = c("darkgreen", "darkgreen", "darkgreen","darkgreen",
+                                "darkgreen", "darkgreen", "darkgreen", "darkgreen")) +
+  scale_y_discrete(limits=rev) +
+  stat_summary(fun=mean, colour=c("darkgreen"), geom="point", 
+               shape=18, size=3, show.legend=FALSE) + 
+  scale_x_continuous(breaks = c(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                                9000, 10000)) + #changes the ticks displayed
+  xlim(0, 10000) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_blank(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=10,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA)) +
+  ylab("study")+ 
+  xlab("Carbon footprint (kgCO2e per capita per year)") 
+ggsave(path = "figures", "boxplot_VN.png", device = "png",  width = 40, 
+       height = 8, units = "cm")
+
+#Vegetarian carbon footprints
+VT_lit<- read.csv("VT_lit.csv")
+data_boxplotVT <- rbind(data_VT,VT_lit)
+boxplot_VT <- ggplot(data_boxplotVT, aes(y=ind, x=values, fill = ind,
+                                         color= ind )) +
+  geom_boxplot(alpha=0.5) +
+  scale_fill_manual(values = c("limegreen", "limegreen", "limegreen","limegreen",
+                               "limegreen", "limegreen", "limegreen", "limegreen", 
+                               "limegreen", "limegreen", "limegreen")) +
+  scale_color_manual(values = c("black", "limegreen", "limegreen","limegreen",
+                                "limegreen", "limegreen", "limegreen", "limegreen", 
+                                "limegreen", "limegreen", "limegreen")) +
+  scale_y_discrete(limits=rev) +
+  stat_summary(fun=mean, colour=c("black", "limegreen", "limegreen","limegreen",
+                                  "limegreen", "limegreen", "limegreen", "limegreen", 
+                                  "limegreen", "limegreen", "limegreen"), geom="point", 
+               shape=18, size=3, show.legend=FALSE) + 
+  scale_x_continuous(breaks = c(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                                9000, 10000)) + #changes the ticks displayed
+  # scale_x_discrete(name = "dietary pattern", limits = c("CF_VN,", 
+  xlim(0, 10000) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_blank(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=10,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA)) +
+  ylab("study")+ 
+  xlab("Carbon footprint (kgCO2e per capita per year)") 
+ggsave(path = "figures", "boxplot_VT.png", device = "png",  width = 50, height = 10, units = "cm")
+
+#Omnivorous carbon footprints
+O_lit<- read.csv("O_lit.csv")
+data_boxplotOMN <- rbind(data_O_low, data_O_medium, data_O_high, O_lit)
+boxplot_OMN <- ggplot(data_boxplotOMN, aes(y=ind, x=values, fill = ind,
+                                           color= ind )) +
+  geom_boxplot(alpha=0.5) +
+  scale_fill_manual(values = c("salmon","red","firebrick4","salmon","red","firebrick4",
+                               "red","red","red","salmon",
+                               "red","salmon","red","red","salmon","red","red",
+                               "red","red","red","salmon")) +
+  scale_color_manual(values = c("black","black","black","salmon","red","firebrick4",
+                                "red","red","red","salmon", 
+                                "red","salmon","red","salmon","red","red","red",
+                                "red","red","red","salmon")) +
+  scale_y_discrete(limits=rev) +
+  stat_summary(fun=mean, colour=c("black","black","black","salmon","red","firebrick4",
+                                  "red","red","red","salmon", 
+                                  "red","salmon","red","salmon","red","red","red",
+                                  "red","red","red","salmon"), geom="point", 
+               shape=18, size=3, show.legend=FALSE) + 
+  scale_x_continuous(breaks = c(0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000,
+                                9000, 10000)) + #changes the ticks displayed
+  xlim(0, 10000) +
+  theme(axis.title.x=element_text(),
+        axis.title.y = element_blank(),
+        axis.text.x=element_text(),
+        axis.ticks.x=element_line(),
+        legend.title = element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size=20),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=10,face="bold"),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA)) +
+  ylab("study")+ 
+  xlab("Carbon footprint (kgCO2e per capita per year)") 
+ggsave(path = "figures", "boxplot_OMN_pf.png", device = "png",  width = 40, height = 20, units = "cm")
+
+#Combine plots
+plot_grid(boxplot_VN, boxplot_VT, boxplot_OMN,
+          rel_heights = c(5,7,13),
+          label_x = 0.2,
+          nrow = 3,
+          axis="r")
+
+
+ggsave(path = "figures", "lit_compare.png", device = "png",  
+       width = 30, height = 50, units = "cm")
 
 #### End of R-Script####

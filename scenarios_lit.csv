@@ -1,0 +1,40 @@
+study,country,diet_type,number,diet_type_specific,diet_type_info,CF,sb
+Berners-Lee et al. (2012),UK,Vegan,1,Vegan (regular plant-based diet),replace m/d w/plant-based,1862,cradle-to-store
+Berners-Lee et al. (2012),UK,Vegetarian,2,Vegetarian (plant-based instead of meat),replace meat w/plant-based,2007,cradle-to-store
+Berners-Lee et al. (2012),UK,Vegan,1,Vegan (healthy plant-based diet),replace m/d w/ healthy plant-based,2044,cradle-to-store
+Berners-Lee et al. (2012),UK,Vegetarian,2,Vegetarian (diary instead of meat),replace meat w/diary,2117,cradle-to-store
+Meier & Christen (2013),D,Vegan,1,Vegan,,960,cradle-to-store
+Meier & Christen (2013),D,Vegetarian,2,Vegetarian,,1560,cradle-to-store
+Scarborough et al. (2014),UK,Vegan,1,Vegan,,1073,cradle-to-store
+Scarborough et al. (2014),UK,Vegetarian,2,Vegetarian,,1405,cradle-to-store
+Scarborough et al. (2014),UK,Pescetarian,3,Pescetarian,,1438,cradle-to-store
+Scarborough et al. (2014),UK,O_low,4,O_low (few meat),few meat,1705,cradle-to-store
+Scarborough et al. (2014),UK,O_medium,5,O_medium (medium meat),medium meat,2066,cradle-to-store
+Scarborough et al. (2014),UK,O_high,6,O_high (much meat),much meat,2686,cradle-to-store
+Taylor (2000),D,Vegetarian,2,Vegetarian,,734,cradle-to-farmgate
+Taylor (2000),D,Vegetarian,2,Vegetarian,,838,cradle-to-retail 
+Taylor (2000),D,O_medium,5,O_medium,,942,cradle-to-farmgate
+Taylor (2000),D,O_medium,5,O_medium,,1047,cradle-to-retail 
+Taylor (2000),D,Vegetarian,2,Vegetarian,,1171,cradle-to-plate 
+Taylor (2000),D,O_medium,5,O_medium,,1380,cradle-to-plate 
+Tyszler et al. (2015),NL,Vegan,1,Vegan,female,876,cradle-to-grave
+Tyszler et al. (2015),NL,O_low,4,O_low (reduced env. impact),female (30% less environmental impact),912,cradle-to-grave
+Tyszler et al. (2015),NL,Vegetarian,2,Vegetarian,female,985,cradle-to-grave
+Tyszler et al. (2015),NL,Pescetarian,3,Pescetarian,female,1131,cradle-to-grave
+Tyszler et al. (2015),NL,O_medium,5,O_medium (healthy diet),healthy female,1314,cradle-to-grave
+Van de Kamp et al. (2018),NL,Pescetarian,3,Pescetarian (sustainable & healthy diet),sustainable & healthy diet,803,cradle-to-plate
+Van de Kamp et al. (2018),NL,Pescetarian,3,Pescetarian (healthy diet),healthy diet,967,cradle-to-plate
+Van de Kamp et al. (2018),NL,O_low,4,O_low (sustainable & healthy diet),sustainable & healthy diet,1058,cradle-to-plate
+Van de Kamp et al. (2018),NL,O_medium,5,O_medium (healthy diet),healthy diet,1496,cradle-to-plate
+Van Dooren et al. (2014) ,NL,Vegan,1,Vegan,,967,cradle-to-farmgate 
+Van Dooren et al. (2014) ,NL,Vegetarian,2,Vegetarian,,1168,cradle-to-farmgate 
+Van Dooren et al. (2014) ,NL,O_medium,5,O_medium,,1241,cradle-to-farmgate 
+Van Dooren et al. (2014) ,NL,O_low,4,O_low (few meat),few meat,1241,cradle-to-farmgate 
+Werner et al. (2014),DK,Vegan,1,Vegan,,877,cradle-to-grave
+Werner et al. (2014),DK,Vegetarian,2,Vegetarian,,1118,cradle-to-grave
+Werner et al. (2014),DK,O_medium,4,O_medium (soy drink instead of milk),soy drink instead of milk,1321,cradle-to-grave
+Werner et al. (2014),DK,O_medium,4,O_medium (no cheese),no cheese,1584,cradle-to-grave
+Werner et al. (2014),DK,O_medium,6,O_medium (much dairy),much dairy,1650,cradle-to-grave
+Werner et al. (2014),DK,O_medium,4,O_medium (no dairy),no dairy,1695,cradle-to-grave
+Werner et al. (2014),DK,O_medium,4,O_medium (no milk),no milk,1761,cradle-to-grave
+Westhoek et al. (2014),EU,O_low,4,O_low (reduced meat),reduced meat,605,cradle-to-farmgate
