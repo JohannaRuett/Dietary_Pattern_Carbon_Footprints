@@ -1,8 +1,8 @@
 # R-Script_and_Input-Datafiles_Ruett_Dietary_Pattern_Carbon_Footprint
-The repository contains input data files and the R-Script used for the analyses conducted in the following master thesis:
+The repository <a href="https://zenodo.org/badge/latestdoi/377050633"><img src="https://zenodo.org/badge/377050633.svg" alt="DOI"></a> contains input data files and the R-Script used for the analyses conducted in the following master thesis:
 "Modelling Carbon Footprints of Western European Dietary Patterns Perfoming Probabilistic Simulation" by Johanna Manon Rütt, submitted 25/06/2021
 
-This repository https://zenodo.org/badge/377050633.svg provides all data and information necessary to understand the thesis' carbon footprint probabilistic simulation, further calculations related to the carbon footprints and corresponding visualization.  
+This repository provides all data and information necessary to understand the thesis' carbon footprint probabilistic simulation, further calculations related to the carbon footprints and corresponding visualization.  
 
 ## File descriptions
 
